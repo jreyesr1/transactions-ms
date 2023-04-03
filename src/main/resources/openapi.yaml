@@ -1,0 +1,203 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: superjoel2009@gmail.com
+    name: Joel Reyes
+  description: Code Challenge for Digital Bank
+  title: Transactions MS - DigitalBank
+  version: '1.0'
+servers:
+  - url: 'http://localhost:3000'
+tags:
+  - name: Transaction
+paths:
+  /transaction:
+    get:
+      description: Query transactions by iban
+      operationId: get-transaction
+      parameters:
+        - description: account iban
+          explode: true
+          in: query
+          name: account_iban
+          required: true
+          schema:
+            type: string
+          style: form
+        - description: Sort by amount (ascending/descending) setting the values of the params (asc/desc)
+          explode: true
+          in: query
+          name: sort_by_amount
+          required: false
+          schema:
+            enum:
+              - asc
+              - desc
+            type: string
+          style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Transaction'
+                type: array
+          description: 'It returns a list of transactions depending on the IBAN , if there''s no transactions it will return an empty array'
+      summary: Transaction
+      tags:
+        - Transaction
+      x-accepts: application/json
+      x-tags:
+        - tag: Transaction
+    post:
+      description: create transaction
+      operationId: create-transaction
+      requestBody:
+        content:
+          application/json:
+            examples:
+              Example 1:
+                value:
+                  reference: 12345A
+                  account_iban: ES9820385778983000760236
+                  date: '2019-07-16T16:55:42.000Z'
+                  amount: 193.38
+                  fee: 3.18
+                  description: Restaurant payment
+            schema:
+              type: object
+              properties:
+                reference:
+                  type: string
+                account_iban:
+                  type: string
+                date:
+                  type: string
+                  format: date-time
+                  x-field-extra-annotation: '@com.digital.bank.transactions.util.interfaces.ValidOffsetDateTime'
+                amount:
+                  type: number
+                  format: double
+                fee:
+                  type: number
+                  format: double
+                description:
+                  type: string
+              required:
+                - account_iban
+                - amount
+        description: To create a Transaction the request body should contains at least 'account_iban' and 'amount' properties
+      responses:
+        '200':
+          description: Transaction created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+      summary: Transaction
+      tags:
+        - Transaction
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+        - tag: Transaction
+  /transaction/status:
+    post:
+      description: Get Transaction Status
+      operationId: post-transaction-status
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reference:
+                  type: string
+                channel:
+                  enum:
+                    - CLIENT
+                    - ATM
+                    - INTERNAL
+                  type: string
+              required:
+                - reference
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: ''
+      summary: Transaction Status
+      tags:
+        - Status
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+        - tag: Status
+components:
+  responses: {}
+  schemas:
+    Transaction:
+      x-class-extra-annotation: '@jakarta.persistence.Entity'
+      title: Transaction
+      type: object
+      x-stoplight:
+        id: 9d0vuh79k62fm
+      properties:
+        reference:
+          type: string
+        date:
+          format: date-time
+          type: string
+        amount:
+          format: double
+          type: number
+        fee:
+          format: double
+          type: number
+        description:
+          type: string
+        status:
+          enum:
+            - PENDING
+            - SETTLED
+            - FUTURE
+            - INVALID
+          type: string
+        id:
+          format: int64
+          type: integer
+          x-field-extra-annotation: '@jakarta.persistence.Id @jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)'
+          readOnly: true
+        account:
+          $ref: '#/components/schemas/Account'
+      required:
+        - amount
+        - account
+    Account:
+      title: Account
+      x-class-extra-annotation: '@jakarta.persistence.Entity'
+      x-stoplight:
+        id: b8ru91s5pdutj
+      type: object
+      description: Client Account
+      properties:
+        account_iban:
+          type: string
+          readOnly: true
+        balance:
+          type: number
+          format: double
+          readOnly: true
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+          x-field-extra-annotation: '@jakarta.persistence.Id @jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)'
+      required:
+        - account_iban
+  requestBodies: {}
+x-stoplight:
+  id: zirmud4l3hmbu

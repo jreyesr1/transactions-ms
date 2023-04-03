@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+    <preConditions>
+        <runningAs  username="liquibase"/>
+    </preConditions>
+    <changeSet  id="1"  author="Joel Reyes">
+        <createTable  tableName="account">
+            <column  name="id"  type="bigInt"  autoIncrement="true">
+                <constraints  primaryKey="true"  nullable="false"/>
+            </column>
+            <column  name="ACCOUNT_IBAN"  type="varchar(255)">
+                <constraints  nullable="false"/>
+            </column>
+            <column  name="balance"  type="decimal">
+                <constraints  nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet  id="2"  author="Joel Reyes">
+        <createTable  tableName="transaction">
+            <column  name="id"  type="bigInt"  autoIncrement="true">
+                <constraints  primaryKey="true"  nullable="false"/>
+            </column>
+            <column  name="reference"  type="varchar(255)">
+                <constraints  nullable="false"/>
+            </column>
+            <column  name="date"  type="timestamp">
+                <constraints  nullable="true"/>
+            </column>
+            <column  name="amount"  type="decimal">
+                <constraints  nullable="true"/>
+            </column>
+            <column  name="fee"  type="decimal">
+                <constraints  nullable="true"/>
+            </column>
+            <column  name="description"  type="varchar(255)">
+                <constraints  nullable="true"/>
+            </column>
+            <column  name="status"  type="varchar(20)">
+                <constraints  nullable="true"/>
+            </column>
+            <column name="ACCOUNT_ID" type="BIGINT"/>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_account"
+                                 baseTableName="transaction"
+                                 baseColumnNames="ACCOUNT_ID"
+                                 referencedTableName="account"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+    <changeSet id="3" author="Joel Reyes">
+        <insert tableName="account">
+            <column name="ACCOUNT_IBAN" value="ES56321478963214523658974"/>
+            <column name="balance" value="1000"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
